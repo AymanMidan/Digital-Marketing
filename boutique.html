@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Shop | FanPass 2030</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { 'mega': ['"Archivo Black"', 'sans-serif'], 'body': ['Inter', 'sans-serif'], }, colors: { 'fp-red': '#FF0040', 'fp-green': '#00EB78', 'fp-yellow': '#FFD600', 'fp-blue': '#0055FF', 'fp-dark': '#121212', } } } }
+    </script>
+</head>
+
+<body x-data="{ color: 'red', edition: 'Maroc', pack: 'duo' }" class="font-body text-fp-dark antialiased">
+    <div class="bg-noise"></div>
+
+    <nav class="absolute top-10 left-0 w-full z-40 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-mega italic tracking-tighter bg-white border-4 border-black px-4 py-2 rounded-full card-shadow">
+                FAN<span class="text-fp-blue">PASS</span>.30
+            </a>
+            <a href="index.html" class="bg-black text-white px-4 py-2 rounded-full font-bold border-2 border-black hover:bg-white hover:text-black transition">Retour</a>
+        </div>
+    </nav>
+
+    <section class="pt-40 pb-10 px-6 text-center reveal-on-scroll">
+        <h1 class="text-6xl md:text-8xl font-mega uppercase mb-4">CRÉE TON <span class="text-fp-green">PASS</span></h1>
+        <p class="text-xl font-bold text-gray-500">Customise ton bracelet. Supporte ton équipe. Vis la légende.</p>
+    </section>
+
+    <section class="pb-20 px-6">
+        <div class="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            
+            <div class="sticky top-10 reveal-on-scroll">
+                <div class="relative bg-white border-4 border-black rounded-[3rem] h-[500px] flex items-center justify-center card-shadow-heavy overflow-hidden">
+                    <div class="absolute w-[500px] h-[500px] rounded-full blur-[80px] opacity-50 transition-colors duration-500"
+                         :class="color === 'red' ? 'bg-fp-red' : (color === 'green' ? 'bg-fp-green' : (color === 'yellow' ? 'bg-fp-yellow' : 'bg-fp-blue' ))">
+                    </div>
+                    
+                    <img src="https://i.pinimg.com/736x/44/73/53/447353028cac88e6145fc6798362e421.jpg" alt="Mockup du bracelet FanPass 2030" class="relative w-3/4 transform rotate-12 drop-shadow-2xl transition-all duration-500"
+                         :style="color === 'red' ? 'filter: hue-rotate(0deg ) saturate(1.5);' : (color === 'green' ? 'filter: hue-rotate(100deg) saturate(1.5);' : (color === 'yellow' ? 'filter: hue-rotate(40deg) saturate(2);' : 'filter: hue-rotate(210deg) saturate(1.5);'))">
+                    
+                    <div class="absolute top-8 right-8 bg-black text-white px-4 py-2 rounded-lg font-mega uppercase text-xl transform rotate-6">
+                        <span x-text="edition">MAROC</span> Edition
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-12 reveal-on-scroll">
+                <div>
+                    <h3 class="font-mega text-2xl uppercase mb-6"><span class="bg-black text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-3">1</span>Choisis ton équipe</h3>
+                    <div class="flex flex-wrap gap-4">
+                        <button @click="edition = 'Maroc'; color = 'red'" :class="edition === 'Maroc' ? 'bg-fp-red text-white ring-4 ring-offset-2 ring-fp-red' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg">🇲🇦 Maroc</button>
+                        <button @click="edition = 'Spain'; color = 'yellow'" :class="edition === 'Spain' ? 'bg-fp-yellow text-black ring-4 ring-offset-2 ring-fp-yellow' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg">🇪🇸 España</button>
+                        <button @click="edition = 'Portugal'; color = 'green'" :class="edition === 'Portugal' ? 'bg-fp-green text-black ring-4 ring-offset-2 ring-fp-green' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg">🇵🇹 Portugal</button>
+                         <button @click="edition = 'World'; color = 'blue'" :class="edition === 'World' ? 'bg-fp-blue text-white ring-4 ring-offset-2 ring-fp-blue' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg">🌍 Global</button>
+                    </div>
+                </div>
+
+                <div>
+                     <h3 class="font-mega text-2xl uppercase mb-6"><span class="bg-black text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-3">2</span>Choisis ton Pack</h3>
+                     <div class="grid gap-6">
+                         <div @click="pack = 'solo'" class="bg-white border-4 border-black p-6 rounded-2xl flex justify-between items-center card-shadow cursor-pointer transition-transform" :class="{ 'scale-105 ring-4 ring-fp-blue': pack === 'solo' }">
+                             <div>
+                                 <h4 class="font-mega text-xl">SOLO RIDER</h4>
+                                 <p class="font-bold text-gray-500 text-sm">Pass de base + Paiement NFC</p>
+                             </div>
+                             <div class="font-mega text-2xl text-fp-blue">59€</div>
+                         </div>
+                         <div @click="pack = 'duo'" class="bg-fp-yellow border-4 border-black p-6 rounded-2xl flex justify-between items-center card-shadow cursor-pointer transition-transform" :class="{ 'scale-105 ring-4 ring-black': pack === 'duo' }">
+                             <div>
+                                 <div class="bg-black text-white text-xs font-bold px-2 py-1 inline-block rounded mb-1 uppercase">Best Value</div>
+                                 <h4 class="font-mega text-xl">DUO SQUAD</h4>
+                                 <p class="font-bold text-black text-sm">2 Pass + 10% Réduc Fanzone</p>
+                             </div>
+                             <div class="font-mega text-3xl">99€</div>
+                         </div>
+                         <div @click="pack = 'family'" class="bg-white border-4 border-black p-6 rounded-2xl flex justify-between items-center card-shadow cursor-pointer transition-transform" :class="{ 'scale-105 ring-4 ring-fp-green': pack === 'family' }">
+                             <div>
+                                 <h4 class="font-mega text-xl">FAMILY (4)</h4>
+                                 <p class="font-bold text-gray-500 text-sm">Sécurité Enfants + Géoloc</p>
+                             </div>
+                             <div class="font-mega text-2xl text-fp-green">180€</div>
+                         </div>
+                     </div>
+                </div>
+
+                <button onclick="alert('Ajouté au panier !')" class="w-full bg-fp-red text-white py-6 rounded-2xl font-mega text-3xl border-4 border-black card-shadow-heavy uppercase">
+                    Commander <i class="fas fa-shopping-cart ml-4"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

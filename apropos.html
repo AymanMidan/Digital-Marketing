@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision | FanPass 2030</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { 'mega': ['"Archivo Black"', 'sans-serif'], 'body': ['Inter', 'sans-serif'], }, colors: { 'fp-red': '#FF0040', 'fp-green': '#00EB78', 'fp-yellow': '#FFD600', 'fp-blue': '#0055FF', 'fp-dark': '#121212', } } } }
+    </script>
+     <style>
+        body { background-color: #000; color: white; } /* Fond noir pour cette page pour changer */
+        .card-shadow-white { box-shadow: 8px 8px 0px #ffffff; }
+    </style>
+</head>
+
+<body class="font-body antialiased">
+
+    <nav class="absolute top-10 left-0 w-full z-40 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-mega italic tracking-tighter bg-white text-black border-4 border-white px-4 py-2 rounded-full">
+                FAN<span class="text-fp-blue">PASS</span>.30
+            </a>
+            <a href="index.html" class="bg-fp-red text-white px-4 py-2 rounded-full font-bold border-2 border-fp-red hover:bg-white hover:text-black transition">Retour</a>
+        </div>
+    </nav>
+
+    <section class="pt-40 pb-20 px-6 text-center">
+        <h1 class="text-6xl md:text-9xl font-mega text-fp-yellow mb-6">3 COUNTRIES.<br>ONE SOUL.</h1>
+        <p class="text-2xl font-bold max-w-2xl mx-auto">La technologie ne doit pas être ennuyeuse. <br>Elle doit être magique.</p>
+    </section>
+
+    <section class="py-20 px-6">
+        <div class="container mx-auto space-y-20">
+            
+            <div class="bg-white text-black p-10 rounded-[3rem] border-4 border-white card-shadow-white grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-5xl font-mega text-fp-blue mb-6">NO MORE WAITING.</h2>
+                    <p class="text-xl font-bold">On a tous vécu ça : rater le coup d'envoi parce qu'on fouille ses poches à l'entrée. C'est fini. Le FanPass utilise une puce NFC haute fréquence. Tu passes ton poignet, tu entres. 0.2 secondes.</p>
+                </div>
+                <div class="h-64 bg-fp-blue rounded-3xl border-4 border-black flex items-center justify-center text-9xl">
+                    ⏱️
+                </div>
+            </div>
+
+            <div class="bg-fp-red text-white p-10 rounded-[3rem] border-4 border-fp-red card-shadow-white grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="order-2 md:order-1 h-64 bg-black rounded-3xl border-4 border-white flex items-center justify-center text-9xl">
+                    🌍
+                </div>
+                <div class="order-1 md:order-2">
+                    <h2 class="text-5xl font-mega text-white mb-6">ONE CURRENCY.</h2>
+                    <p class="text-xl font-bold">Maroc (Dirham), Espagne & Portugal (Euro). Un casse-tête ? Pas pour nous. Charge ton compte sur l'app, paye partout. Le bracelet fait la conversion instantanée sans frais.</p>
+                </div>
+            </div>
+
+             <div class="bg-fp-green text-black p-10 rounded-[3rem] border-4 border-fp-green card-shadow-white grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-5xl font-mega text-black mb-6">PLANET FIRST.</h2>
+                    <p class="text-xl font-bold">Pas de papier, pas de plastique jetable. Le bracelet est fait à 100% de filets de pêche recyclés récupérés en Méditerranée et Atlantique. Tech for Good.</p>
+                </div>
+                <div class="h-64 bg-white rounded-3xl border-4 border-black flex items-center justify-center text-9xl">
+                    ♻️
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="text-center py-20">
+        <h2 class="text-4xl font-mega mb-8">PRÊT À CHANGER LE JEU ?</h2>
+        <a href="boutique.html" class="inline-block bg-fp-yellow text-black text-2xl px-12 py-6 rounded-full font-mega border-4 border-white hover:scale-105 transition uppercase">
+            Let's Go 🚀
+        </a>
+    </footer>
+
+</body>
+</html>
