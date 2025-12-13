@@ -4,97 +4,439 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Le Shop | FanPass 2030</title>
+    <meta name="description" content="Commande ton bracelet intelligent FanPass 2030 - Accès VIP à la Coupe du Monde 2030 au Maroc, Espagne et Portugal">
+    <meta property="og:title" content="FanPass 2030 - Le Bracelet Connecté du Mondial">
+    <meta property="og:description" content="Vis l'expérience ultime de la Coupe du Monde 2030">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
     
     <script>
         tailwind.config = { theme: { extend: { fontFamily: { 'mega': ['"Archivo Black"', 'sans-serif'], 'body': ['Inter', 'sans-serif'], }, colors: { 'fp-red': '#FF0040', 'fp-green': '#00EB78', 'fp-yellow': '#FFD600', 'fp-blue': '#0055FF', 'fp-dark': '#121212', } } } }
     </script>
+    
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(12deg); }
+            50% { transform: translateY(-20px) rotate(12deg); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 64, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 0, 64, 0.6); }
+        }
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
+        }
+        .bg-noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .card-shadow { box-shadow: 6px 6px 0 rgba(0,0,0,1); }
+        .card-shadow-heavy { box-shadow: 10px 10px 0 rgba(0,0,0,1); }
+        .bracelet-float { animation: float 3s ease-in-out infinite; }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confetti 2s ease-out forwards;
+        }
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+        .reveal-on-scroll.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        @keyframes slideInFromTop {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .slide-in { animation: slideInFromTop 0.8s ease-out; }
+    </style>
 </head>
 
-<body x-data="{ color: 'red', edition: 'Maroc', pack: 'duo' }" class="font-body text-fp-dark antialiased">
+<body x-data="shopApp()" class="font-body text-fp-dark antialiased">
     <div class="bg-noise"></div>
 
-    <nav class="absolute top-10 left-0 w-full z-40 px-6">
+    <nav class="absolute top-10 left-0 w-full z-40 px-6 slide-in">
         <div class="container mx-auto flex justify-between items-center">
             <a href="index.html" class="text-2xl font-mega italic tracking-tighter bg-white border-4 border-black px-4 py-2 rounded-full card-shadow">
                 FAN<span class="text-fp-blue">PASS</span>.30
             </a>
-            <a href="index.html" class="bg-black text-white px-4 py-2 rounded-full font-bold border-2 border-black hover:bg-white hover:text-black transition">Retour</a>
+            <div class="flex gap-4">
+                <a href="panier.html" class="relative bg-white border-4 border-black px-4 py-2 rounded-full font-bold hover:bg-fp-yellow transition">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span x-show="cartCount > 0" x-text="cartCount" class="absolute -top-2 -right-2 bg-fp-red text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold"></span>
+                </a>
+                <a href="index.html" class="bg-black text-white px-4 py-2 rounded-full font-bold border-2 border-black hover:bg-white hover:text-black transition">Retour</a>
+            </div>
         </div>
     </nav>
 
+    <!-- Countdown Timer -->
+    <div class="fixed top-32 right-6 z-30 bg-black text-white px-6 py-4 rounded-2xl border-4 border-white card-shadow reveal-on-scroll">
+        <div class="text-xs font-bold mb-1 text-fp-yellow">⚽ COUPE DU MONDE 2030</div>
+        <div class="font-mega text-2xl" x-text="countdown"></div>
+    </div>
+
+    <!-- Early Bird Banner -->
+    <div class="fixed bottom-6 left-6 right-6 z-30 bg-fp-yellow border-4 border-black p-4 rounded-xl card-shadow-heavy text-center reveal-on-scroll" style="animation-delay: 0.3s;">
+        <p class="font-black text-lg">
+            🚨 OFFRE EARLY BIRD : -20% jusqu'au 31 décembre ! Code: <span class="bg-black text-fp-yellow px-2 py-1 rounded">EARLY2030</span>
+        </p>
+    </div>
+
     <section class="pt-40 pb-10 px-6 text-center reveal-on-scroll">
         <h1 class="text-6xl md:text-8xl font-mega uppercase mb-4">CRÉE TON <span class="text-fp-green">PASS</span></h1>
-        <p class="text-xl font-bold text-gray-500">Customise ton bracelet. Supporte ton équipe. Vis la légende.</p>
+        <p class="text-xl font-bold text-gray-500 mb-6">Customise ton bracelet. Supporte ton équipe. Vis la légende.</p>
+        
+        <!-- Live Stats -->
+        <div class="flex items-center justify-center gap-8 text-sm font-bold">
+            <span class="flex items-center gap-2">
+                🔥 <span class="text-fp-red" x-text="liveViewers"></span> personnes regardent
+            </span>
+            <span class="flex items-center gap-2">
+                ⚡ <span class="text-fp-green" x-text="soldToday"></span> vendus aujourd'hui
+            </span>
+            <span class="flex items-center gap-2">
+                ⭐ <span class="text-fp-blue">4.9/5</span> (2,847 avis)
+            </span>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="pb-16 px-6 reveal-on-scroll">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-mega uppercase text-center mb-12">Ce que tu vas <span class="text-fp-red">vivre</span></h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="bg-white border-4 border-black rounded-2xl p-6 text-center card-shadow hover:translate-y-[-4px] transition-transform">
+                    <div class="text-6xl mb-4">⚡</div>
+                    <p class="font-bold">Entrée express<br>sans file d'attente</p>
+                </div>
+                <div class="bg-white border-4 border-black rounded-2xl p-6 text-center card-shadow hover:translate-y-[-4px] transition-transform">
+                    <div class="text-6xl mb-4">💳</div>
+                    <p class="font-bold">Paiement NFC<br>ultra-rapide</p>
+                </div>
+                <div class="bg-white border-4 border-black rounded-2xl p-6 text-center card-shadow hover:translate-y-[-4px] transition-transform">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <p class="font-bold">Accès VIP<br>Fanzones exclusives</p>
+                </div>
+                <div class="bg-white border-4 border-black rounded-2xl p-6 text-center card-shadow hover:translate-y-[-4px] transition-transform">
+                    <div class="text-6xl mb-4">🚌</div>
+                    <p class="font-bold">Transport gratuit<br>Bus & Trams</p>
+                </div>
+            </div>
+        </div>
     </section>
 
     <section class="pb-20 px-6">
         <div class="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             
+            <!-- Product Preview -->
             <div class="sticky top-10 reveal-on-scroll">
                 <div class="relative bg-white border-4 border-black rounded-[3rem] h-[500px] flex items-center justify-center card-shadow-heavy overflow-hidden">
                     <div class="absolute w-[500px] h-[500px] rounded-full blur-[80px] opacity-50 transition-colors duration-500"
                          :class="color === 'red' ? 'bg-fp-red' : (color === 'green' ? 'bg-fp-green' : (color === 'yellow' ? 'bg-fp-yellow' : 'bg-fp-blue' ))">
                     </div>
                     
-                    <img src="https://i.pinimg.com/736x/44/73/53/447353028cac88e6145fc6798362e421.jpg" alt="Mockup du bracelet FanPass 2030" class="relative w-3/4 transform rotate-12 drop-shadow-2xl transition-all duration-500"
-                         :style="color === 'red' ? 'filter: hue-rotate(0deg ) saturate(1.5);' : (color === 'green' ? 'filter: hue-rotate(100deg) saturate(1.5);' : (color === 'yellow' ? 'filter: hue-rotate(40deg) saturate(2);' : 'filter: hue-rotate(210deg) saturate(1.5);'))">
+                    <img src="https://i.pinimg.com/736x/44/73/53/447353028cac88e6145fc6798362e421.jpg" 
+                         alt="Mockup du bracelet FanPass 2030" 
+                         class="relative w-3/4 bracelet-float drop-shadow-2xl transition-all duration-500"
+                         :style="color === 'red' ? 'filter: hue-rotate(0deg) saturate(1.5);' : (color === 'green' ? 'filter: hue-rotate(100deg) saturate(1.5);' : (color === 'yellow' ? 'filter: hue-rotate(40deg) saturate(2);' : 'filter: hue-rotate(210deg) saturate(1.5);'))">
                     
                     <div class="absolute top-8 right-8 bg-black text-white px-4 py-2 rounded-lg font-mega uppercase text-xl transform rotate-6">
-                        <span x-text="edition">MAROC</span> Edition
+                        <span x-text="edition"></span> Edition
                     </div>
+                    
+                    <!-- Confetti Container -->
+                    <div id="confetti-container" class="absolute inset-0 pointer-events-none"></div>
                 </div>
+                
+                <!-- Team Message -->
+                <div class="mt-6 bg-black text-white p-6 rounded-2xl border-4 border-black text-center font-mega text-2xl" x-show="teamMessage" x-text="teamMessage"></div>
             </div>
 
+            <!-- Configuration Panel -->
             <div class="space-y-12 reveal-on-scroll">
                 <div>
                     <h3 class="font-mega text-2xl uppercase mb-6"><span class="bg-black text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-3">1</span>Choisis ton équipe</h3>
                     <div class="flex flex-wrap gap-4">
-                        <button @click="edition = 'Maroc'; color = 'red'" :class="edition === 'Maroc' ? 'bg-fp-red text-white ring-4 ring-offset-2 ring-fp-red' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg">🇲🇦 Maroc</button>
-                        <button @click="edition = 'Spain'; color = 'yellow'" :class="edition === 'Spain' ? 'bg-fp-yellow text-black ring-4 ring-offset-2 ring-fp-yellow' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg">🇪🇸 España</button>
-                        <button @click="edition = 'Portugal'; color = 'green'" :class="edition === 'Portugal' ? 'bg-fp-green text-black ring-4 ring-offset-2 ring-fp-green' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg">🇵🇹 Portugal</button>
-                         <button @click="edition = 'World'; color = 'blue'" :class="edition === 'World' ? 'bg-fp-blue text-white ring-4 ring-offset-2 ring-fp-blue' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg">🌍 Global</button>
+                        <button @click="selectTeam('Maroc', 'red', '🦁 Allez les Lions de l\'Atlas!')" :class="edition === 'Maroc' ? 'bg-fp-red text-white ring-4 ring-offset-2 ring-fp-red scale-110' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg transition-all hover:scale-105">🇲🇦 Maroc</button>
+                        <button @click="selectTeam('España', 'yellow', '⚽ ¡Vamos España!')" :class="edition === 'España' ? 'bg-fp-yellow text-black ring-4 ring-offset-2 ring-fp-yellow scale-110' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg transition-all hover:scale-105">🇪🇸 España</button>
+                        <button @click="selectTeam('Portugal', 'green', '💪 Força Portugal!')" :class="edition === 'Portugal' ? 'bg-fp-green text-black ring-4 ring-offset-2 ring-fp-green scale-110' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg transition-all hover:scale-105">🇵🇹 Portugal</button>
+                         <button @click="selectTeam('Global', 'blue', '🌍 Un Monde, Un Ballon!')" :class="edition === 'Global' ? 'bg-fp-blue text-white ring-4 ring-offset-2 ring-fp-blue scale-110' : 'bg-white'" class="px-6 py-3 rounded-xl font-black border-4 border-black card-shadow uppercase text-lg transition-all hover:scale-105">🌍 Global</button>
                     </div>
                 </div>
 
+                <!-- Comparison Table -->
                 <div>
                      <h3 class="font-mega text-2xl uppercase mb-6"><span class="bg-black text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-3">2</span>Choisis ton Pack</h3>
-                     <div class="grid gap-6">
-                         <div @click="pack = 'solo'" class="bg-white border-4 border-black p-6 rounded-2xl flex justify-between items-center card-shadow cursor-pointer transition-transform" :class="{ 'scale-105 ring-4 ring-fp-blue': pack === 'solo' }">
+                     
+                     <!-- Packs Grid -->
+                     <div class="grid gap-6 mb-8">
+                         <div @click="pack = 'solo'" class="bg-white border-4 border-black p-6 rounded-2xl flex justify-between items-center card-shadow cursor-pointer transition-all hover:scale-105" :class="{ 'scale-105 ring-4 ring-fp-blue': pack === 'solo' }">
                              <div>
                                  <h4 class="font-mega text-xl">SOLO RIDER</h4>
                                  <p class="font-bold text-gray-500 text-sm">Pass de base + Paiement NFC</p>
                              </div>
-                             <div class="font-mega text-2xl text-fp-blue">59€</div>
-                         </div>
-                         <div @click="pack = 'duo'" class="bg-fp-yellow border-4 border-black p-6 rounded-2xl flex justify-between items-center card-shadow cursor-pointer transition-transform" :class="{ 'scale-105 ring-4 ring-black': pack === 'duo' }">
                              <div>
-                                 <div class="bg-black text-white text-xs font-bold px-2 py-1 inline-block rounded mb-1 uppercase">Best Value</div>
+                                 <div class="font-mega text-2xl text-fp-blue">59€</div>
+                                 <div class="text-xs text-gray-400 line-through">74€</div>
+                             </div>
+                         </div>
+                         <div @click="pack = 'duo'" class="bg-fp-yellow border-4 border-black p-6 rounded-2xl flex justify-between items-center card-shadow cursor-pointer transition-all hover:scale-105" :class="{ 'scale-105 ring-4 ring-black': pack === 'duo' }">
+                             <div>
+                                 <div class="bg-black text-white text-xs font-bold px-2 py-1 inline-block rounded mb-1 uppercase">⭐ Best Value</div>
                                  <h4 class="font-mega text-xl">DUO SQUAD</h4>
                                  <p class="font-bold text-black text-sm">2 Pass + 10% Réduc Fanzone</p>
                              </div>
-                             <div class="font-mega text-3xl">99€</div>
+                             <div>
+                                 <div class="font-mega text-3xl">99€</div>
+                                 <div class="text-xs text-gray-600 line-through">124€</div>
+                             </div>
                          </div>
-                         <div @click="pack = 'family'" class="bg-white border-4 border-black p-6 rounded-2xl flex justify-between items-center card-shadow cursor-pointer transition-transform" :class="{ 'scale-105 ring-4 ring-fp-green': pack === 'family' }">
+                         <div @click="pack = 'family'" class="bg-white border-4 border-black p-6 rounded-2xl flex justify-between items-center card-shadow cursor-pointer transition-all hover:scale-105" :class="{ 'scale-105 ring-4 ring-fp-green': pack === 'family' }">
                              <div>
                                  <h4 class="font-mega text-xl">FAMILY (4)</h4>
                                  <p class="font-bold text-gray-500 text-sm">Sécurité Enfants + Géoloc</p>
                              </div>
-                             <div class="font-mega text-2xl text-fp-green">180€</div>
+                             <div>
+                                 <div class="font-mega text-2xl text-fp-green">180€</div>
+                                 <div class="text-xs text-gray-400 line-through">225€</div>
+                             </div>
                          </div>
+                     </div>
+                     
+                     <!-- Comparison Table -->
+                     <div class="bg-white border-4 border-black rounded-2xl overflow-hidden">
+                         <table class="w-full text-sm">
+                             <thead class="bg-black text-white">
+                                 <tr>
+                                     <th class="p-3 text-left font-mega uppercase">Fonctionnalité</th>
+                                     <th class="p-3 text-center font-mega">Solo</th>
+                                     <th class="p-3 text-center font-mega bg-fp-yellow text-black">Duo</th>
+                                     <th class="p-3 text-center font-mega">Family</th>
+                                 </tr>
+                             </thead>
+                             <tbody class="font-bold">
+                                 <tr class="border-b-2 border-black">
+                                     <td class="p-3">Accès stades & fanzones</td>
+                                     <td class="p-3 text-center">✅</td>
+                                     <td class="p-3 text-center bg-fp-yellow/20">✅</td>
+                                     <td class="p-3 text-center">✅</td>
+                                 </tr>
+                                 <tr class="border-b-2 border-black">
+                                     <td class="p-3">Paiement NFC</td>
+                                     <td class="p-3 text-center">✅</td>
+                                     <td class="p-3 text-center bg-fp-yellow/20">✅</td>
+                                     <td class="p-3 text-center">✅</td>
+                                 </tr>
+                                 <tr class="border-b-2 border-black">
+                                     <td class="p-3">Transport gratuit</td>
+                                     <td class="p-3 text-center">✅</td>
+                                     <td class="p-3 text-center bg-fp-yellow/20">✅</td>
+                                     <td class="p-3 text-center">✅</td>
+                                 </tr>
+                                 <tr class="border-b-2 border-black">
+                                     <td class="p-3">Réductions Fanzone</td>
+                                     <td class="p-3 text-center">❌</td>
+                                     <td class="p-3 text-center bg-fp-yellow/20">10%</td>
+                                     <td class="p-3 text-center">15%</td>
+                                 </tr>
+                                 <tr class="border-b-2 border-black">
+                                     <td class="p-3">Géolocalisation enfants</td>
+                                     <td class="p-3 text-center">❌</td>
+                                     <td class="p-3 text-center bg-fp-yellow/20">❌</td>
+                                     <td class="p-3 text-center">✅</td>
+                                 </tr>
+                                 <tr>
+                                     <td class="p-3">Zone VIP lounge</td>
+                                     <td class="p-3 text-center">❌</td>
+                                     <td class="p-3 text-center bg-fp-yellow/20">❌</td>
+                                     <td class="p-3 text-center">✅</td>
+                                 </tr>
+                             </tbody>
+                         </table>
                      </div>
                 </div>
 
-                <button onclick="alert('Ajouté au panier !')" class="w-full bg-fp-red text-white py-6 rounded-2xl font-mega text-3xl border-4 border-black card-shadow-heavy uppercase">
+                <button @click="addToCart()" class="w-full bg-fp-red text-white py-6 rounded-2xl font-mega text-3xl border-4 border-black card-shadow-heavy uppercase hover:bg-black hover:text-fp-red transition-all">
                     Commander <i class="fas fa-shopping-cart ml-4"></i>
                 </button>
+                
+                <!-- Share Section -->
+                <div class="bg-fp-blue text-white border-4 border-black p-6 rounded-2xl card-shadow text-center">
+                    <h4 class="font-mega text-xl mb-3">🎁 Parraine 3 amis → -10€</h4>
+                    <button onclick="window.open('https://wa.me/?text=Regarde%20ce%20bracelet%20FanPass%202030%20!', '_blank')" class="bg-white text-fp-blue px-6 py-3 rounded-xl font-black border-4 border-black card-shadow hover:scale-105 transition-transform">
+                        <i class="fab fa-whatsapp mr-2"></i> Partager sur WhatsApp
+                    </button>
+                </div>
             </div>
         </div>
     </section>
-    <script src="assets/js/app.js"></script>
+
+    <!-- Testimonials Section -->
+    <section class="pb-20 px-6 reveal-on-scroll">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-mega uppercase text-center mb-12">Ils ont <span class="text-fp-red">adoré</span></h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white border-4 border-black p-6 rounded-2xl card-shadow">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-full bg-fp-red border-4 border-black flex items-center justify-center text-3xl">👨</div>
+                        <div>
+                            <div class="flex text-fp-yellow text-xl">★★★★★</div>
+                            <p class="font-bold text-sm text-gray-500">Youssef, Casablanca</p>
+                        </div>
+                    </div>
+                    <p class="font-bold">"Le bracelet le plus stylé que j'ai eu ! L'entrée sans file d'attente au stade, c'est juste magique 🔥"</p>
+                </div>
+                
+                <div class="bg-white border-4 border-black p-6 rounded-2xl card-shadow">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-full bg-fp-yellow border-4 border-black flex items-center justify-center text-3xl">👩</div>
+                        <div>
+                            <div class="flex text-fp-yellow text-xl">★★★★★</div>
+                            <p class="font-bold text-sm text-gray-500">Sofia, Madrid</p>
+                        </div>
+                    </div>
+                    <p class="font-bold">"Parfait pour le pack famille ! La géolocalisation me rassure énormément avec mes enfants dans la foule."</p>
+                </div>
+                
+                <div class="bg-white border-4 border-black p-6 rounded-2xl card-shadow">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-full bg-fp-green border-4 border-black flex items-center justify-center text-3xl">👨</div>
+                        <div>
+                            <div class="flex text-fp-yellow text-xl">★★★★★</div>
+                            <p class="font-bold text-sm text-gray-500">Miguel, Porto</p>
+                        </div>
+                    </div>
+                    <p class="font-bold">"Le paiement NFC ultra rapide ! Plus besoin de chercher ma carte, tout est dans mon bracelet. Génial ⚡"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function shopApp() {
+            return {
+                color: 'red',
+                edition: 'Maroc',
+                pack: 'duo',
+                teamMessage: '🦁 Allez les Lions de l\'Atlas!',
+                countdown: '',
+                liveViewers: 127,
+                soldToday: 18,
+                cartCount: 0,
+                
+                init() {
+                    this.updateCountdown();
+                    setInterval(() => this.updateCountdown(), 1000);
+                    
+                    // Load cart count
+                    const cart = JSON.parse(localStorage.getItem('fanpass_cart') || '[]');
+                    this.cartCount = cart.length;
+                    
+                    // Simulate live data
+                    setInterval(() => {
+                        this.liveViewers += Math.floor(Math.random() * 5) - 2;
+                        if (this.liveViewers < 100) this.liveViewers = 100;
+                    }, 3000);
+                    
+                    setInterval(() => {
+                        if (Math.random() > 0.7) {
+                            this.soldToday += 1;
+                        }
+                    }, 5000);
+                    
+                    // Reveal on scroll
+                    this.setupScrollReveal();
+                },
+                
+                updateCountdown() {
+                    const targetDate = new Date('2030-06-01T00:00:00');
+                    const now = new Date();
+                    const diff = targetDate - now;
+                    
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    
+                    this.countdown = `${days}j ${hours}h`;
+                },
+                
+                selectTeam(team, colorVal, message) {
+                    this.edition = team;
+                    this.color = colorVal;
+                    this.teamMessage = message;
+                    this.createConfetti(colorVal);
+                },
+                
+                createConfetti(colorVal) {
+                    const container = document.getElementById('confetti-container');
+                    const colors = {
+                        'red': '#FF0040',
+                        'green': '#00EB78',
+                        'yellow': '#FFD600',
+                        'blue': '#0055FF'
+                    };
+                    
+                    for (let i = 0; i < 30; i++) {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'confetti';
+                        confetti.style.left = Math.random() * 100 + '%';
+                        confetti.style.backgroundColor = colors[colorVal];
+                        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                        container.appendChild(confetti);
+                        
+                        setTimeout(() => confetti.remove(), 2000);
+                    }
+                },
+                
+                addToCart() {
+                    const prices = { 'solo': 59, 'duo': 99, 'family': 180 };
+                    const item = {
+                        edition: this.edition,
+                        pack: this.pack,
+                        color: this.color,
+                        price: prices[this.pack],
+                        quantity: 1
+                    };
+                    
+                    // Save to localStorage
+                    let cart = JSON.parse(localStorage.getItem('fanpass_cart') || '[]');
+                    cart.push(item);
+                    localStorage.setItem('fanpass_cart', JSON.stringify(cart));
+                    
+                    this.cartCount = cart.length;
+                    
+                    // Redirect to cart page
+                    window.location.href = 'panier.html';
+                },
+                
+                setupScrollReveal() {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('revealed');
+                            }
+                        });
+                    }, { threshold: 0.1 });
+                    
+                    document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+                        observer.observe(el);
+                    });
+                }
+            }
+        }
+    </script>
 </body>
 </html>
