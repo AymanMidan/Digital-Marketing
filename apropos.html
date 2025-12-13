@@ -3,78 +3,831 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vision | FanPass 2030</title>
+    <title>Vision & Mission | FanPass 2030</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
-        tailwind.config = { theme: { extend: { fontFamily: { 'mega': ['"Archivo Black"', 'sans-serif'], 'body': ['Inter', 'sans-serif'], }, colors: { 'fp-red': '#FF0040', 'fp-green': '#00EB78', 'fp-yellow': '#FFD600', 'fp-blue': '#0055FF', 'fp-dark': '#121212', } } } }
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    fontFamily: { 
+                        'mega': ['"Archivo Black"', 'sans-serif'], 
+                        'body': ['Inter', 'sans-serif'], 
+                    }, 
+                    colors: { 
+                        'fp-red': '#FF0040', 
+                        'fp-green': '#00EB78', 
+                        'fp-yellow': '#FFD600', 
+                        'fp-blue': '#0055FF', 
+                        'fp-dark': '#121212', 
+                    } 
+                } 
+            } 
+        }
     </script>
-     <style>
-        body { background-color: #000; color: white; } /* Fond noir pour cette page pour changer */
-        .card-shadow-white { box-shadow: 8px 8px 0px #ffffff; }
+    
+    <style>
+        body { background: linear-gradient(135deg, #121212 0%, #1a0a2e 100%); }
+        .card-shadow { box-shadow: 8px 8px 0px #000000; transition: all 0.3s; }
+        .card-shadow:hover { box-shadow: 12px 12px 0px #000000; transform: translate(-2px, -2px); }
+        
+        /* Hero parallax effect */
+        .parallax-bg {
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,0,64,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0,85,255,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0,235,120,0.2) 0%, transparent 60%);
+            animation: float-bg 15s ease-in-out infinite;
+        }
+        
+        @keyframes float-bg {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+        
+        /* Counter animation */
+        .counter { animation: count-up 2s ease-out forwards; }
+        
+        @keyframes count-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Card flip effect */
+        .flip-card {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 2rem;
+        }
+        
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        
+        /* Timeline */
+        .timeline-item {
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 0.6s ease;
+        }
+        
+        .timeline-item.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Pulse animation */
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.95);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0.95);
+                opacity: 1;
+            }
+        }
+        
+        /* Reveal on scroll */
+        .reveal {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.8s ease;
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Globe rotation */
+        .globe-rotate {
+            animation: rotate-globe 30s linear infinite;
+        }
+        
+        @keyframes rotate-globe {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(90deg, #FF0040, #0055FF, #00EB78, #FFD600);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 5s ease infinite;
+        }
+        
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
     </style>
 </head>
 
-<body class="font-body antialiased">
+<body x-data="{
+    mobileMenu: false,
+    stats: {
+        supporters: 1000000,
+        countries: 3,
+        co2Saved: 200,
+        transactions: 1000000
+    },
+    targetStats: {
+        supporters: 5000000,
+        countries: 3,
+        co2Saved: 450,
+        transactions: 15000000
+    },
+    activeTimeline: 0,
+    flippedCards: []
+}" 
+x-init="
+    // Animated counters
+    const animateCounter = (key, target, duration = 2000) => {
+        const increment = target / (duration / 16);
+        const interval = setInterval(() => {
+            if (stats[key] < target) {
+                stats[key] = Math.min(stats[key] + increment, target);
+            } else {
+                clearInterval(interval);
+                stats[key] = target;
+            }
+        }, 16);
+    };
+    
+    // Intersection Observer for reveals
+    setTimeout(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    
+                    // Trigger counters when stats section is visible
+                    if (entry.target.id === 'stats-section') {
+                        animateCounter('supporters', targetStats.supporters);
+                        animateCounter('countries', targetStats.countries, 1000);
+                        animateCounter('co2Saved', targetStats.co2Saved);
+                        animateCounter('transactions', targetStats.transactions);
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.reveal, .timeline-item').forEach(el => observer.observe(el));
+    }, 100);
+    
+    // Timeline auto-progress
+    setInterval(() => {
+        activeTimeline = (activeTimeline + 1) % 4;
+    }, 3000);
+" class="font-body text-white antialiased">
 
-    <nav class="absolute top-10 left-0 w-full z-40 px-6">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 px-6 py-6 bg-black/80 backdrop-blur-lg border-b-4 border-fp-red">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-mega italic tracking-tighter bg-white text-black border-4 border-white px-4 py-2 rounded-full">
+            <a href="index.html" class="text-2xl font-mega italic tracking-tighter bg-white text-black border-4 border-white px-4 py-2 rounded-full shadow-[4px_4px_0px_#FF0040]">
                 FAN<span class="text-fp-blue">PASS</span>.30
             </a>
-            <a href="index.html" class="bg-fp-red text-white px-4 py-2 rounded-full font-bold border-2 border-fp-red hover:bg-white hover:text-black transition">Retour</a>
+            
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="font-bold hover:text-fp-yellow transition">Accueil</a>
+                <a href="boutique.html" class="bg-fp-red text-white px-6 py-2 rounded-full font-mega border-2 border-black hover:bg-white hover:text-black transition uppercase text-sm shadow-[4px_4px_0px_#000]">
+                    Shop
+                </a>
+            </div>
         </div>
     </nav>
 
-    <section class="pt-40 pb-20 px-6 text-center">
-        <h1 class="text-6xl md:text-9xl font-mega text-fp-yellow mb-6">3 COUNTRIES.<br>ONE SOUL.</h1>
-        <p class="text-2xl font-bold max-w-2xl mx-auto">La technologie ne doit pas être ennuyeuse. <br>Elle doit être magique.</p>
-    </section>
-
-    <section class="py-20 px-6">
-        <div class="container mx-auto space-y-20">
+    <!-- Hero Section -->
+    <section class="relative pt-40 pb-32 px-6 overflow-hidden">
+        <div class="parallax-bg absolute inset-0 opacity-50"></div>
+        
+        <div class="container mx-auto text-center relative z-10">
+            <div class="inline-block bg-fp-yellow text-black px-6 py-3 rounded-full font-black border-4 border-black shadow-[6px_6px_0px_#000] uppercase text-sm mb-8 pulse-ring">
+                ⚡ Marketing 5.0 • Tech Centrée Humain
+            </div>
             
-            <div class="bg-white text-black p-10 rounded-[3rem] border-4 border-white card-shadow-white grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h2 class="text-5xl font-mega text-fp-blue mb-6">NO MORE WAITING.</h2>
-                    <p class="text-xl font-bold">On a tous vécu ça : rater le coup d'envoi parce qu'on fouille ses poches à l'entrée. C'est fini. Le FanPass utilise une puce NFC haute fréquence. Tu passes ton poignet, tu entres. 0.2 secondes.</p>
-                </div>
-                <div class="h-64 bg-fp-blue rounded-3xl border-4 border-black flex items-center justify-center text-9xl">
-                    ⏱️
-                </div>
+            <h1 class="text-6xl md:text-9xl font-mega mb-8 leading-none">
+                RÉINVENTER<br>
+                <span class="gradient-text">L'EXPÉRIENCE</span><br>
+                <span class="text-fp-green">SUPPORTER</span>
+            </h1>
+            
+            <p class="text-2xl md:text-3xl font-bold max-w-4xl mx-auto mb-12 leading-relaxed">
+                Nous ne vendons pas un bracelet. Nous créons une <span class="text-fp-yellow">révolution digitale</span> qui transforme chaque supporter en <span class="text-fp-blue">protagoniste</span> de son expérience.
+            </p>
+            
+            <!-- Scroll indicator -->
+            <div class="animate-bounce mt-12">
+                <i class="fas fa-chevron-down text-4xl text-fp-red"></i>
             </div>
-
-            <div class="bg-fp-red text-white p-10 rounded-[3rem] border-4 border-fp-red card-shadow-white grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div class="order-2 md:order-1 h-64 bg-black rounded-3xl border-4 border-white flex items-center justify-center text-9xl">
-                    🌍
-                </div>
-                <div class="order-1 md:order-2">
-                    <h2 class="text-5xl font-mega text-white mb-6">ONE CURRENCY.</h2>
-                    <p class="text-xl font-bold">Maroc (Dirham), Espagne & Portugal (Euro). Un casse-tête ? Pas pour nous. Charge ton compte sur l'app, paye partout. Le bracelet fait la conversion instantanée sans frais.</p>
-                </div>
-            </div>
-
-             <div class="bg-fp-green text-black p-10 rounded-[3rem] border-4 border-fp-green card-shadow-white grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h2 class="text-5xl font-mega text-black mb-6">PLANET FIRST.</h2>
-                    <p class="text-xl font-bold">Pas de papier, pas de plastique jetable. Le bracelet est fait à 100% de filets de pêche recyclés récupérés en Méditerranée et Atlantique. Tech for Good.</p>
-                </div>
-                <div class="h-64 bg-white rounded-3xl border-4 border-black flex items-center justify-center text-9xl">
-                    ♻️
-                </div>
-            </div>
-
         </div>
     </section>
 
-    <footer class="text-center py-20">
-        <h2 class="text-4xl font-mega mb-8">PRÊT À CHANGER LE JEU ?</h2>
-        <a href="boutique.html" class="inline-block bg-fp-yellow text-black text-2xl px-12 py-6 rounded-full font-mega border-4 border-white hover:scale-105 transition uppercase">
-            Let's Go 🚀
-        </a>
+    <!-- Stats Section avec Compteurs Animés -->
+    <section id="stats-section" class="py-20 px-6 reveal">
+        <div class="container mx-auto">
+            <div class="bg-gradient-to-br from-fp-red via-fp-blue to-fp-green p-1 rounded-[3rem] shadow-2xl">
+                <div class="bg-black rounded-[2.8rem] p-12">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                        <div>
+                            <div class="text-6xl font-mega text-fp-yellow mb-3" x-text="Math.floor(stats.supporters / 1000000) + 'M+'"></div>
+                            <p class="font-bold text-lg">Supporters Attendus</p>
+                        </div>
+                        <div>
+                            <div class="text-6xl font-mega text-fp-green mb-3" x-text="stats.countries"></div>
+                            <p class="font-bold text-lg">Pays Unifiés</p>
+                        </div>
+                        <div>
+                            <div class="text-6xl font-mega text-fp-blue mb-3" x-text="Math.floor(stats.co2Saved) + 'T'"></div>
+                            <p class="font-bold text-lg">CO₂ Économisé (tonnes)</p>
+                        </div>
+                        <div>
+                            <div class="text-6xl font-mega text-fp-red mb-3" x-text="Math.floor(stats.transactions / 1000000) + 'M+'"></div>
+                            <p class="font-bold text-lg">Transactions Prévues</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section class="py-20 px-6">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-5xl md:text-7xl font-mega uppercase mb-6">
+                    NOTRE <span class="text-fp-red">MISSION</span>
+                </h2>
+                <p class="text-xl font-bold text-gray-400 max-w-3xl mx-auto">
+                    Transformer la technologie en expérience humaine
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-3 gap-8 mb-16">
+                <!-- Card 1 -->
+                <div class="flip-card h-96">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-fp-red p-8 border-4 border-black card-shadow flex flex-col items-center justify-center text-center">
+                            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 border-4 border-black">
+                                <i class="fas fa-heart text-5xl text-fp-red"></i>
+                            </div>
+                            <h3 class="text-3xl font-mega uppercase mb-4">Centré Humain</h3>
+                            <p class="font-bold text-lg">Hover pour découvrir</p>
+                        </div>
+                        <div class="flip-card-back bg-black p-8 border-4 border-fp-red card-shadow flex flex-col justify-center">
+                            <h3 class="text-2xl font-mega uppercase mb-4 text-fp-red">Notre Philosophie</h3>
+                            <p class="font-bold text-lg leading-relaxed">
+                                Chaque décision technologique est prise avec une question : "Est-ce que ça améliore l'expérience humaine ?" Pas de tech pour la tech. Juste l'innovation qui sert.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="flip-card h-96">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-fp-green text-black p-8 border-4 border-black card-shadow flex flex-col items-center justify-center text-center">
+                            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 border-4 border-black">
+                                <i class="fas fa-leaf text-5xl text-fp-green"></i>
+                            </div>
+                            <h3 class="text-3xl font-mega uppercase mb-4">Durabilité</h3>
+                            <p class="font-bold text-lg">Hover pour découvrir</p>
+                        </div>
+                        <div class="flip-card-back bg-black p-8 border-4 border-fp-green card-shadow flex flex-col justify-center">
+                            <h3 class="text-2xl font-mega uppercase mb-4 text-fp-green">Impact Positif</h3>
+                            <p class="font-bold text-lg leading-relaxed">
+                                100% de nos bracelets sont fabriqués à partir de filets de pêche recyclés. Zéro papier, zéro plastique jetable. Tech for Good, pas juste for Profit.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 3 -->
+                <div class="flip-card h-96">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-fp-blue p-8 border-4 border-black card-shadow flex flex-col items-center justify-center text-center">
+                            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 border-4 border-black">
+                                <i class="fas fa-users text-5xl text-fp-blue"></i>
+                            </div>
+                            <h3 class="text-3xl font-mega uppercase mb-4">Inclusion</h3>
+                            <p class="font-bold text-lg">Hover pour découvrir</p>
+                        </div>
+                        <div class="flip-card-back bg-black p-8 border-4 border-fp-blue card-shadow flex flex-col justify-center">
+                            <h3 class="text-2xl font-mega uppercase mb-4 text-fp-blue">Pour Tous</h3>
+                            <p class="font-bold text-lg leading-relaxed">
+                                Accessibilité totale : modes simplifiés pour seniors, contrôle parental, support multi-langues (15 langues), interface vocale. Personne n'est laissé derrière.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Le Problème que nous résolvons -->
+    <section class="py-20 px-6 bg-black/50">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-5xl md:text-7xl font-mega uppercase mb-6">
+                    LE <span class="text-fp-yellow">PROBLÈME</span>
+                </h2>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="reveal">
+                    <div class="bg-gradient-to-br from-red-900 to-red-600 p-12 rounded-[3rem] border-4 border-red-500 card-shadow">
+                        <h3 class="text-4xl font-mega mb-8 text-white">❌ L'ANCIEN MONDE</h3>
+                        <ul class="space-y-6 text-xl font-bold">
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">😤</span>
+                                <span>45 minutes d'attente moyenne à l'entrée</span>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">💸</span>
+                                <span>Frais de change : 8-12% perdus en conversion</span>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">📄</span>
+                                <span>Tickets papier = 2.5 tonnes de déchets par match</span>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">😰</span>
+                                <span>Parents qui perdent leurs enfants dans la foule</span>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">🤷</span>
+                                <span>Expérience fragmentée sur 3 pays différents</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="reveal">
+                    <div class="bg-gradient-to-br from-fp-green to-green-400 text-black p-12 rounded-[3rem] border-4 border-black card-shadow">
+                        <h3 class="text-4xl font-mega mb-8">✅ NOTRE SOLUTION</h3>
+                        <ul class="space-y-6 text-xl font-bold">
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">⚡</span>
+                                <span>Accès en 1.8 secondes avec NFC</span>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">💳</span>
+                                <span>0% de frais - Conversion automatique blockchain</span>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">♻️</span>
+                                <span>100% digital = Zéro déchet papier</span>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">📍</span>
+                                <span>Géolocalisation familiale temps réel</span>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span class="text-3xl">🌍</span>
+                                <span>1 bracelet unifié pour 3 pays</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Visuelle -->
+    <section class="py-20 px-6">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-5xl md:text-7xl font-mega uppercase mb-6">
+                    NOTRE <span class="text-fp-blue">TECH STACK</span>
+                </h2>
+                <p class="text-xl font-bold text-gray-400">Les technologies qui propulsent l'innovation</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-4 gap-6">
+                <div class="bg-white text-black p-8 rounded-2xl border-4 border-black card-shadow text-center reveal">
+                    <div class="w-20 h-20 bg-fp-red rounded-2xl border-4 border-black flex items-center justify-center mx-auto mb-6 text-4xl text-white">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <h3 class="text-2xl font-mega uppercase mb-3">NFC</h3>
+                    <p class="font-bold text-sm">13.56 MHz<br>Lecture < 2s<br>Portée 10cm</p>
+                </div>
+                
+                <div class="bg-white text-black p-8 rounded-2xl border-4 border-black card-shadow text-center reveal">
+                    <div class="w-20 h-20 bg-fp-green rounded-2xl border-4 border-black flex items-center justify-center mx-auto mb-6 text-4xl text-white">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <h3 class="text-2xl font-mega uppercase mb-3">Blockchain</h3>
+                    <p class="font-bold text-sm">Ethereum L2<br>Gas fees < 0.01€<br>100% sécurisé</p>
+                </div>
+                
+                <div class="bg-white text-black p-8 rounded-2xl border-4 border-black card-shadow text-center reveal">
+                    <div class="w-20 h-20 bg-fp-blue rounded-2xl border-4 border-black flex items-center justify-center mx-auto mb-6 text-4xl text-white">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="text-2xl font-mega uppercase mb-3">IA Prédictive</h3>
+                    <p class="font-bold text-sm">Machine Learning<br>Personnalisation<br>Temps réel</p>
+                </div>
+                
+                <div class="bg-white text-black p-8 rounded-2xl border-4 border-black card-shadow text-center reveal">
+                    <div class="w-20 h-20 bg-fp-yellow rounded-2xl border-4 border-black flex items-center justify-center mx-auto mb-6 text-4xl">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3 class="text-2xl font-mega uppercase mb-3">Cloud</h3>
+                    <p class="font-bold text-sm">AWS / Azure<br>99.99% uptime<br>Multi-région</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Interactive -->
+    <section class="py-20 px-6 bg-black/50">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-5xl md:text-7xl font-mega uppercase mb-6">
+                    <span class="text-fp-red">ROADMAP</span> 2025-2030
+                </h2>
+            </div>
+            
+            <div class="max-w-4xl mx-auto space-y-8">
+                <!-- Timeline Item 1 -->
+                <div class="timeline-item flex gap-6 items-start" :class="{ 'active': activeTimeline >= 0 }">
+                    <div class="flex-shrink-0 w-32 text-right">
+                        <div class="text-3xl font-mega text-fp-yellow">2025</div>
+                        <div class="text-sm font-bold text-gray-400">Q1-Q2</div>
+                    </div>
+                    <div class="w-1 bg-fp-yellow rounded-full flex-shrink-0"></div>
+                    <div class="flex-1 bg-white text-black p-6 rounded-2xl border-4 border-black card-shadow">
+                        <h3 class="text-2xl font-mega uppercase mb-3">🚀 Lancement Prototype</h3>
+                        <p class="font-bold">Tests pilotes dans 3 stades majeurs. Retours utilisateurs. Optimisation UX.</p>
+                    </div>
+                </div>
+                
+                <!-- Timeline Item 2 -->
+                <div class="timeline-item flex gap-6 items-start" :class="{ 'active': activeTimeline >= 1 }">
+                    <div class="flex-shrink-0 w-32 text-right">
+                        <div class="text-3xl font-mega text-fp-green">2026</div>
+                        <div class="text-sm font-bold text-gray-400">Q3-Q4</div>
+                    </div>
+                    <div class="w-1 bg-fp-green rounded-full flex-shrink-0"></div>
+                    <div class="flex-1 bg-white text-black p-6 rounded-2xl border-4 border-black card-shadow">
+                        <h3 class="text-2xl font-mega uppercase mb-3">📱 App Mobile V2</h3>
+                        <p class="font-bold">IA prédictive avancée. Social features. Marketplace NFT intégré.</p>
+                    </div>
+                </div>
+                
+                <!-- Timeline Item 3 -->
+                <div class="timeline-item flex gap-6 items-start" :class="{ 'active': activeTimeline >= 2 }">
+                    <div class="flex-shrink-0 w-32 text-right">
+                        <div class="text-3xl font-mega text-fp-blue">2028</div>
+                        <div class="text-sm font-bold text-gray-400">Q1-Q2</div>
+                    </div>
+                    <div class="w-1 bg-fp-blue rounded-full flex-shrink-0"></div>
+                    <div class="flex-1 bg-white text-black p-6 rounded-2xl border-4 border-black card-shadow">
+                        <h3 class="text-2xl font-mega uppercase mb-3">🌍 Expansion Globale</h3>
+                        <p class="font-bold">Partenariats avec 50+ stades internationaux. Déploiement Amérique & Asie.</p>
+                    </div>
+                </div>
+                
+                <!-- Timeline Item 4 -->
+                <div class="timeline-item flex gap-6 items-start" :class="{ 'active': activeTimeline >= 3 }">
+                    <div class="flex-shrink-0 w-32 text-right">
+                        <div class="text-3xl font-mega text-fp-red">2030</div>
+                        <div class="text-sm font-bold text-gray-400">MONDIAL</div>
+                    </div>
+                    <div class="w-1 bg-fp-red rounded-full flex-shrink-0"></div>
+                    <div class="flex-1 bg-gradient-to-br from-fp-red via-fp-blue to-fp-green text-white p-6 rounded-2xl border-4 border-black card-shadow">
+                        <h3 class="text-2xl font-mega uppercase mb-3">🏆 MONDIAL 2030</h3>
+                        <p class="font-bold">5M+ supporters équipés. Expérience unifiée Maroc-Espagne-Portugal. Game Changer.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- L'Équipe -->
+    <section class="py-20 px-6">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-5xl md:text-7xl font-mega uppercase mb-6">
+                    L'<span class="text-fp-green">ÉQUIPE</span>
+                </h2>
+                <p class="text-xl font-bold text-gray-400">Les visionnaires derrière FanPass</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Team Member 1 -->
+                <div class="bg-white text-black rounded-2xl border-4 border-black card-shadow overflow-hidden reveal">
+                    <div class="h-64 bg-gradient-to-br from-fp-red to-fp-blue flex items-center justify-center text-8xl">
+                        👨‍💻
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-mega uppercase mb-2">Youssef K.</h3>
+                        <p class="font-bold text-fp-red mb-3">CEO & Co-Founder</p>
+                        <p class="text-sm font-bold text-gray-600">Ex-Google • 10 ans fintech • Passionné de football</p>
+                    </div>
+                </div>
+                
+                <!-- Team Member 2 -->
+                <div class="bg-white text-black rounded-2xl border-4 border-black card-shadow overflow-hidden reveal">
+                    <div class="h-64 bg-gradient-to-br from-fp-green to-fp-yellow flex items-center justify-center text-8xl">
+                        👩‍💼
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-mega uppercase mb-2">Sofia M.</h3>
+                        <p class="font-bold text-fp-green mb-3">CTO & Co-Founder</p>
+                        <p class="text-sm font-bold text-gray-600">MIT • Blockchain expert • IA & Machine Learning</p>
+                    </div>
+                </div>
+                
+                <!-- Team Member 3 -->
+                <div class="bg-white text-black rounded-2xl border-4 border-black card-shadow overflow-hidden reveal">
+                    <div class="h-64 bg-gradient-to-br from-fp-blue to-fp-green flex items-center justify-center text-8xl">
+                        👨‍🎨
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-mega uppercase mb-2">Carlos R.</h3>
+                        <p class="font-bold text-fp-blue mb-3">Chief Design Officer</p>
+                        <p class="text-sm font-bold text-gray-600">Ex-Apple • Design Thinking • UX obsessed</p>
+                    </div>
+                </div>
+                
+                <!-- Team Member 4 -->
+                <div class="bg-white text-black rounded-2xl border-4 border-black card-shadow overflow-hidden reveal">
+                    <div class="h-64 bg-gradient-to-br from-fp-yellow to-fp-red flex items-center justify-center text-8xl">
+                        👩‍🔬
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-mega uppercase mb-2">Amina L.</h3>
+                        <p class="font-bold text-fp-yellow mb-3">Chief Sustainability</p>
+                        <p class="text-sm font-bold text-gray-600">PhD Environnement • Green Tech • Impact social</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Manifeste Marketing 5.0 -->
+    <section class="py-20 px-6 bg-black/50">
+        <div class="container mx-auto">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-5xl md:text-7xl font-mega uppercase mb-6">
+                        NOTRE <span class="gradient-text">MANIFESTE</span>
+                    </h2>
+                    <p class="text-xl font-bold text-gray-400">Les 5 piliers du Marketing 5.0</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-fp-red to-red-600 p-8 rounded-2xl border-4 border-black card-shadow reveal">
+                        <div class="flex items-start gap-6">
+                            <div class="flex-shrink-0 w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl font-mega text-fp-red border-4 border-black">1</div>
+                            <div>
+                                <h3 class="text-2xl font-mega uppercase mb-3">TECHNOLOGIE POUR L'HUMAIN</h3>
+                                <p class="font-bold text-lg">La tech ne remplace pas l'émotion, elle l'amplifie. Chaque ligne de code est écrite pour améliorer l'expérience humaine, pas pour la remplacer.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-fp-green to-green-600 p-8 rounded-2xl border-4 border-black card-shadow reveal">
+                        <div class="flex items-start gap-6">
+                            <div class="flex-shrink-0 w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl font-mega text-fp-green border-4 border-black">2</div>
+                            <div>
+                                <h3 class="text-2xl font-mega uppercase mb-3 text-black">DATA ÉTHIQUE & TRANSPARENTE</h3>
+                                <p class="font-bold text-lg text-black">Vos données vous appartiennent. Nous les utilisons pour personnaliser, jamais pour manipuler. Transparence totale, contrôle total.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-fp-blue to-blue-600 p-8 rounded-2xl border-4 border-black card-shadow reveal">
+                        <div class="flex items-start gap-6">
+                            <div class="flex-shrink-0 w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl font-mega text-fp-blue border-4 border-black">3</div>
+                            <div>
+                                <h3 class="text-2xl font-mega uppercase mb-3">INCLUSIVITÉ PAR DESIGN</h3>
+                                <p class="font-bold text-lg">Jeunes, seniors, personnes à mobilité réduite : notre tech s'adapte à tous. L'accessibilité n'est pas une option, c'est notre fondation.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-fp-yellow to-yellow-600 p-8 rounded-2xl border-4 border-black card-shadow reveal">
+                        <div class="flex items-start gap-6">
+                            <div class="flex-shrink-0 w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl font-mega text-fp-yellow border-4 border-black">4</div>
+                            <div>
+                                <h3 class="text-2xl font-mega uppercase mb-3 text-black">DURABILITÉ RADICALE</h3>
+                                <p class="font-bold text-lg text-black">Chaque décision est mesurée par son impact environnemental. Profit ET planète, pas l'un ou l'autre.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-8 rounded-2xl border-4 border-black card-shadow reveal">
+                        <div class="flex items-start gap-6">
+                            <div class="flex-shrink-0 w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl font-mega text-purple-600 border-4 border-black">5</div>
+                            <div>
+                                <h3 class="text-2xl font-mega uppercase mb-3">COMMUNAUTÉ AVANT PROFIT</h3>
+                                <p class="font-bold text-lg">Nous construisons une communauté, pas juste une base clients. Vos retours façonnent le produit. Vous êtes co-créateurs.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partenaires -->
+    <section class="py-20 px-6">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-5xl md:text-7xl font-mega uppercase mb-6">
+                    NOS <span class="text-fp-blue">PARTENAIRES</span>
+                </h2>
+                <p class="text-xl font-bold text-gray-400">Ils nous font confiance</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                <!-- FIFA -->
+                <div class="bg-white p-8 rounded-2xl border-4 border-black card-shadow flex items-center justify-center reveal h-32">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/FIFA_logo_without_slogan.svg/1200px-FIFA_logo_without_slogan.svg.png" alt="FIFA" class="max-h-20 max-w-full object-contain">
+                </div>
+                
+                <!-- Royal Air Maroc -->
+                <div class="bg-white p-8 rounded-2xl border-4 border-black card-shadow flex items-center justify-center reveal h-32">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN9J7Dr_p9eD3mKR-2U7W3JNV5GhrFkRonNQ&s" alt="Royal Air Maroc" class="max-h-16 max-w-full object-contain">
+                </div>
+                
+                <!-- VISA -->
+                <div class="bg-white p-8 rounded-2xl border-4 border-black card-shadow flex items-center justify-center reveal h-32">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="VISA" class="max-h-12 max-w-full object-contain">
+                </div>
+                
+                <!-- Omio -->
+                <div class="bg-white p-8 rounded-2xl border-4 border-black card-shadow flex items-center justify-center reveal h-32">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDWDCENuhWJ6eAN751FaU-OpKH1JFbUuMjZg&s" alt="Omio" class="max-h-10 max-w-full object-contain">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- ONCF -->
+                <div class="bg-white p-8 rounded-2xl border-4 border-black card-shadow flex items-center justify-center reveal h-32">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Logo-oncf.png" alt="ONCF" class="max-h-16 max-w-full object-contain">
+                </div>
+                
+                <!-- Amazon -->
+                <div class="bg-white p-8 rounded-2xl border-4 border-black card-shadow flex items-center justify-center reveal h-32">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/2560px-Amazon_logo.svg.png" alt="Amazon" class="max-h-12 max-w-full object-contain">
+                </div>
+                
+                <!-- Al Boraq -->
+                <div class="bg-white p-8 rounded-2xl border-4 border-black card-shadow flex items-center justify-center reveal h-32">
+                    <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/7/71/Al_Boraq.png/1280px-Al_Boraq.png" alt="Al Boraq" class="max-h-20 max-w-full object-contain">
+                </div>
+                
+                <!-- Iberia -->
+                <div class="bg-white p-8 rounded-2xl border-4 border-black card-shadow flex items-center justify-center reveal h-32">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2ABEC8vS6O9Q3-KsyYoQC2-SeLXvHm3KCVw&s" alt="Iberia" class="max-h-16 max-w-full object-contain">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="py-32 px-6 text-center">
+        <div class="container mx-auto reveal">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-5xl md:text-7xl font-mega uppercase mb-8 leading-tight">
+                    PRÊT À REJOINDRE<br>
+                    <span class="gradient-text">LA RÉVOLUTION ?</span>
+                </h2>
+                
+                <p class="text-2xl font-bold mb-12 text-gray-300">
+                    Ne sois pas spectateur. Sois acteur du changement.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                    <a href="boutique.html" class="bg-fp-red text-white px-12 py-6 rounded-2xl font-mega text-2xl border-4 border-black shadow-[8px_8px_0px_#000] hover:translate-y-1 hover:shadow-[4px_4px_0px_#000] transition uppercase">
+                        <i class="fas fa-shopping-cart mr-2"></i> Commander
+                    </a>
+                    <a href="contact.html" class="bg-white text-black px-12 py-6 rounded-2xl font-mega text-2xl border-4 border-black shadow-[8px_8px_0px_#000] hover:translate-y-1 hover:shadow-[4px_4px_0px_#000] transition uppercase">
+                        <i class="fas fa-envelope mr-2"></i> Contact
+                    </a>
+                </div>
+                
+                <div class="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+                    <div>
+                        <div class="text-4xl font-mega text-fp-yellow mb-2">100%</div>
+                        <p class="font-bold text-sm">Satisfaction</p>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-mega text-fp-green mb-2">5000+</div>
+                        <p class="font-bold text-sm">Early Adopters</p>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-mega text-fp-blue mb-2">2030</div>
+                        <p class="font-bold text-sm">Le Futur</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t-4 border-fp-red py-16 px-6">
+        <div class="container mx-auto">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <div>
+                    <a href="index.html" class="text-2xl font-mega italic tracking-tighter bg-white text-black border-4 border-white px-4 py-2 rounded-full inline-block mb-6">
+                        FAN<span class="text-fp-blue">PASS</span>.30
+                    </a>
+                    <p class="font-bold text-gray-400 mb-6">Tech centrée humain pour le Mondial 2030.</p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-12 h-12 bg-white text-black rounded-full border-4 border-white flex items-center justify-center hover:bg-fp-red hover:text-white transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 bg-white text-black rounded-full border-4 border-white flex items-center justify-center hover:bg-fp-blue hover:text-white transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 bg-white text-black rounded-full border-4 border-white flex items-center justify-center hover:bg-fp-green hover:text-white transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 bg-white text-black rounded-full border-4 border-white flex items-center justify-center hover:bg-fp-yellow hover:text-black transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-mega text-lg mb-6 uppercase text-fp-yellow">Navigation</h4>
+                    <ul class="space-y-3 font-bold">
+                        <li><a href="index.html" class="hover:text-fp-red transition">→ Accueil</a></li>
+                        <li><a href="boutique.html" class="hover:text-fp-green transition">→ Shop</a></li>
+                        <li><a href="apropos.html" class="hover:text-fp-blue transition">→ Vision</a></li>
+                        <li><a href="contact.html" class="hover:text-fp-yellow transition">→ Contact</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-mega text-lg mb-6 uppercase text-fp-green">Produits</h4>
+                    <ul class="space-y-3 font-bold">
+                        <li><a href="boutique.html" class="hover:text-fp-red transition">→ Pack Solo (59€)</a></li>
+                        <li><a href="boutique.html" class="hover:text-fp-yellow transition">→ Pack Duo (99€)</a></li>
+                        <li><a href="boutique.html" class="hover:text-fp-green transition">→ Pack Family (180€)</a></li>
+                        <li><a href="boutique.html" class="hover:text-fp-blue transition">→ VIP Experience</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-mega text-lg mb-6 uppercase text-fp-blue">Support</h4>
+                    <ul class="space-y-3 font-bold">
+                        <li><a href="#" class="hover:text-fp-red transition">→ FAQ</a></li>
+                        <li><a href="contact.html" class="hover:text-fp-green transition">→ Service Client</a></li>
+                        <li><a href="#" class="hover:text-fp-yellow transition">→ CGV / CGU</a></li>
+                        <li><a href="#" class="hover:text-fp-blue transition">→ Confidentialité</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t-4 border-gray-800 pt-8 text-center">
+                <p class="font-mega text-sm mb-2">© 2030 FANPASS INTERNATIONAL</p>
+                <p class="text-sm font-bold text-gray-500">Projet Académique - Marketing Digital 5.0 | Propulsé par NFC + Blockchain + IA</p>
+                <div class="flex justify-center gap-4 mt-4 text-xs font-bold text-gray-600">
+                    <span>🇲🇦 MAROC</span>
+                    <span>🇪🇸 ESPAÑA</span>
+                    <span>🇵🇹 PORTUGAL</span>
+                </div>
+            </div>
+        </div>
     </footer>
 
 </body>
