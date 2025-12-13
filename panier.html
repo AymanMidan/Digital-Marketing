@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Panier | FanPass 2030</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { 'mega': ['"Archivo Black"', 'sans-serif'], 'body': ['Inter', 'sans-serif'], }, colors: { 'fp-red': '#FF0040', 'fp-green': '#00EB78', 'fp-yellow': '#FFD600', 'fp-blue': '#0055FF', 'fp-dark': '#121212', } } } }
+    </script>
+    
+    <style>
+        @keyframes slideInFromRight {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .bg-noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .card-shadow { box-shadow: 6px 6px 0 rgba(0,0,0,1); }
+        .card-shadow-heavy { box-shadow: 10px 10px 0 rgba(0,0,0,1); }
+        .slide-in-right { animation: slideInFromRight 0.6s ease-out; }
+        .bounce-animation { animation: bounce 2s ease-in-out infinite; }
+        .progress-bar {
+            transition: width 0.3s ease-out;
+        }
+    </style>
+</head>
+
+<body x-data="cartApp()" class="font-body text-fp-dark antialiased bg-gray-50">
+    <div class="bg-noise"></div>
+
+    <nav class="bg-white border-b-4 border-black sticky top-0 z-40 px-6 py-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-mega italic tracking-tighter bg-white border-4 border-black px-4 py-2 rounded-full card-shadow">
+                FAN<span class="text-fp-blue">PASS</span>.30
+            </a>
+            <div class="flex gap-4 items-center">
+                <div class="text-sm font-bold">
+                    <span class="text-gray-500">Étape 2/3:</span>
+                    <span class="text-fp-green">Panier</span>
+                </div>
+                <a href="boutique.html" class="bg-black text-white px-4 py-2 rounded-full font-bold border-2 border-black hover:bg-fp-yellow hover:text-black transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Continuer mes achats
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b-4 border-black">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-mega text-sm">🛒 PANIER</span>
+                <span class="font-mega text-sm text-gray-400">📦 LIVRAISON</span>
+                <span class="font-mega text-sm text-gray-400">💳 PAIEMENT</span>
+            </div>
+            <div class="w-full bg-gray-200 h-3 rounded-full border-2 border-black overflow-hidden">
+                <div class="progress-bar bg-fp-green h-full rounded-full" style="width: 33.33%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty Cart Message -->
+    <div x-show="cartItems.length === 0" class="container mx-auto px-6 py-20 text-center">
+        <div class="bounce-animation inline-block text-8xl mb-6">🛒</div>
+        <h2 class="text-4xl font-mega uppercase mb-4">Ton panier est vide</h2>
+        <p class="text-xl text-gray-500 mb-8">Il est temps de te préparer pour la Coupe du Monde 2030 ! ⚽</p>
+        <a href="boutique.html" class="inline-block bg-fp-red text-white px-8 py-4 rounded-2xl font-mega text-xl border-4 border-black card-shadow-heavy uppercase hover:bg-black hover:text-fp-red transition-all">
+            Découvrir les Pass <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+    </div>
+
+    <!-- Cart Content -->
+    <div x-show="cartItems.length > 0" class="container mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Cart Items -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-4xl font-mega uppercase">Mon Panier <span class="text-fp-blue" x-text="`(${cartItems.length})`"></span></h1>
+                    <button @click="clearCart()" class="text-fp-red font-bold hover:underline text-sm">
+                        <i class="fas fa-trash mr-2"></i>Vider le panier
+                    </button>
+                </div>
+
+                <template x-for="(item, index) in cartItems" :key="index">
+                    <div class="bg-white border-4 border-black rounded-2xl p-6 card-shadow slide-in-right">
+                        <div class="flex gap-6">
+                            <!-- Product Image -->
+                            <div class="relative w-32 h-32 rounded-xl border-4 border-black flex items-center justify-center overflow-hidden"
+                                 :class="item.color === 'red' ? 'bg-fp-red/20' : (item.color === 'green' ? 'bg-fp-green/20' : (item.color === 'yellow' ? 'bg-fp-yellow/20' : 'bg-fp-blue/20'))">
+                                <img src="https://i.pinimg.com/736x/44/73/53/447353028cac88e6145fc6798362e421.jpg" 
+                                     alt="Bracelet FanPass" 
+                                     class="w-24 transform rotate-12"
+                                     :style="item.color === 'red' ? 'filter: hue-rotate(0deg) saturate(1.5);' : (item.color === 'green' ? 'filter: hue-rotate(100deg) saturate(1.5);' : (item.color === 'yellow' ? 'filter: hue-rotate(40deg) saturate(2);' : 'filter: hue-rotate(210deg) saturate(1.5);'))">
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 class="font-mega text-xl uppercase mb-1" x-text="item.pack === 'solo' ? 'Solo Rider' : (item.pack === 'duo' ? 'Duo Squad' : 'Family (4)')"></h3>
+                                        <p class="text-sm font-bold text-gray-500">
+                                            <span x-text="item.edition"></span> Edition • 
+                                            <span :class="item.color === 'red' ? 'text-fp-red' : (item.color === 'green' ? 'text-fp-green' : (item.color === 'yellow' ? 'text-fp-yellow' : 'text-fp-blue'))" x-text="item.color === 'red' ? '🔴 Rouge' : (item.color === 'green' ? '🟢 Vert' : (item.color === 'yellow' ? '🟡 Jaune' : '🔵 Bleu'))"></span>
+                                        </p>
+                                        <div class="mt-2 flex gap-2">
+                                            <span class="bg-fp-green/20 text-fp-green text-xs font-bold px-2 py-1 rounded border-2 border-fp-green">✓ Paiement NFC</span>
+                                            <span class="bg-fp-blue/20 text-fp-blue text-xs font-bold px-2 py-1 rounded border-2 border-fp-blue">✓ Accès VIP</span>
+                                        </div>
+                                    </div>
+                                    <button @click="removeItem(index)" class="text-gray-400 hover:text-fp-red transition-colors">
+                                        <i class="fas fa-times text-2xl"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Quantity & Price -->
+                                <div class="flex justify-between items-center mt-4">
+                                    <div class="flex items-center gap-3">
+                                        <button @click="updateQuantity(index, -1)" class="w-8 h-8 bg-gray-200 border-2 border-black rounded-lg font-bold hover:bg-black hover:text-white transition">-</button>
+                                        <span class="font-mega text-xl w-8 text-center" x-text="item.quantity"></span>
+                                        <button @click="updateQuantity(index, 1)" class="w-8 h-8 bg-gray-200 border-2 border-black rounded-lg font-bold hover:bg-black hover:text-white transition">+</button>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-mega text-2xl" x-text="`${item.price * item.quantity}€`"></div>
+                                        <div class="text-xs text-gray-400 line-through" x-text="`${Math.round(item.price * item.quantity * 1.25)}€`"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Promo Code -->
+                <div class="bg-white border-4 border-black rounded-2xl p-6 card-shadow">
+                    <div class="flex gap-4">
+                        <input x-model="promoCode" type="text" placeholder="Code promo (ex: EARLY2030)" class="flex-1 px-4 py-3 border-4 border-black rounded-xl font-bold uppercase focus:outline-none focus:ring-4 focus:ring-fp-yellow">
+                        <button @click="applyPromo()" class="bg-fp-yellow border-4 border-black px-6 py-3 rounded-xl font-black uppercase hover:bg-black hover:text-fp-yellow transition-all">
+                            Appliquer
+                        </button>
+                    </div>
+                    <div x-show="promoApplied" class="mt-3 bg-fp-green/20 border-2 border-fp-green rounded-lg px-4 py-2 text-sm font-bold text-fp-green">
+                        ✅ Code promo appliqué : -20% sur ta commande !
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white border-4 border-black rounded-2xl p-6 card-shadow-heavy sticky top-28">
+                    <h2 class="font-mega text-2xl uppercase mb-6 pb-4 border-b-4 border-black">Récapitulatif</h2>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between font-bold">
+                            <span>Sous-total (<span x-text="totalItems"></span> articles)</span>
+                            <span x-text="`${subtotal}€`"></span>
+                        </div>
+                        <div class="flex justify-between font-bold text-fp-green" x-show="promoApplied">
+                            <span>Code promo (-20%)</span>
+                            <span x-text="`-${discount}€`"></span>
+                        </div>
+                        <div class="flex justify-between font-bold text-gray-500">
+                            <span>Livraison</span>
+                            <span class="text-fp-green">GRATUITE</span>
+                        </div>
+                        <div class="pt-4 border-t-4 border-black flex justify-between items-center">
+                            <span class="font-mega text-xl">TOTAL</span>
+                            <span class="font-mega text-3xl text-fp-red" x-text="`${total}€`"></span>
+                        </div>
+                    </div>
+
+                    <!-- Free Shipping Progress -->
+                    <div class="bg-fp-blue/10 border-2 border-fp-blue rounded-xl p-4 mb-6" x-show="total < 150">
+                        <p class="text-sm font-bold text-fp-blue mb-2">
+                            🚚 Plus que <span x-text="150 - total"></span>€ pour la livraison express gratuite !
+                        </p>
+                        <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-fp-blue h-full rounded-full transition-all" :style="`width: ${(total / 150) * 100}%`"></div>
+                        </div>
+                    </div>
+
+                    <div x-show="total >= 150" class="bg-fp-green/20 border-2 border-fp-green rounded-xl p-4 mb-6 text-center">
+                        <p class="font-bold text-fp-green">✅ Livraison express gratuite activée !</p>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="grid grid-cols-3 gap-3 mb-6 text-center text-xs font-bold">
+                        <div class="bg-gray-50 border-2 border-black rounded-lg p-3">
+                            <div class="text-2xl mb-1">🔒</div>
+                            <div>Paiement sécurisé</div>
+                        </div>
+                        <div class="bg-gray-50 border-2 border-black rounded-lg p-3">
+                            <div class="text-2xl mb-1">↩️</div>
+                            <div>Retour 30j</div>
+                        </div>
+                        <div class="bg-gray-50 border-2 border-black rounded-lg p-3">
+                            <div class="text-2xl mb-1">⚡</div>
+                            <div>Livraison rapide</div>
+                        </div>
+                    </div>
+
+                    <button @click="checkout()" class="w-full bg-fp-red text-white py-5 rounded-2xl font-mega text-2xl border-4 border-black card-shadow-heavy uppercase hover:bg-black hover:text-fp-red transition-all mb-4">
+                        Commander <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+
+                    <div class="text-center text-xs text-gray-500 font-bold">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        Paiement 100% sécurisé SSL
+                    </div>
+                </div>
+
+                <!-- Reassurance -->
+                <div class="mt-6 bg-fp-yellow border-4 border-black rounded-2xl p-4 card-shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="text-4xl">🎁</div>
+                        <div class="text-sm font-bold">
+                            <div class="text-black">Besoin d'aide ?</div>
+                            <div class="text-gray-700">Contact: support@fanpass2030.com</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upsell Section -->
+    <div x-show="cartItems.length > 0" class="bg-white border-t-4 border-black py-12">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-mega uppercase mb-8 text-center">Complète ton <span class="text-fp-green">expérience</span></h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white border-4 border-black rounded-2xl p-6 card-shadow text-center hover:scale-105 transition-transform">
+                    <div class="text-6xl mb-4">📱</div>
+                    <h3 class="font-mega text-xl mb-2">APP PREMIUM</h3>
+                    <p class="text-sm font-bold text-gray-500 mb-4">Accès aux stats en temps réel</p>
+                    <div class="font-mega text-2xl text-fp-blue mb-4">9.99€/mois</div>
+                    <button class="bg-fp-blue text-white px-6 py-2 rounded-xl font-bold border-2 border-black hover:bg-black transition">Ajouter</button>
+                </div>
+                <div class="bg-white border-4 border-black rounded-2xl p-6 card-shadow text-center hover:scale-105 transition-transform">
+                    <div class="text-6xl mb-4">🎒</div>
+                    <h3 class="font-mega text-xl mb-2">FANZONE KIT</h3>
+                    <p class="text-sm font-bold text-gray-500 mb-4">T-shirt + Drapeau officiel</p>
+                    <div class="font-mega text-2xl text-fp-green mb-4">29€</div>
+                    <button class="bg-fp-green text-white px-6 py-2 rounded-xl font-bold border-2 border-black hover:bg-black transition">Ajouter</button>
+                </div>
+                <div class="bg-white border-4 border-black rounded-2xl p-6 card-shadow text-center hover:scale-105 transition-transform">
+                    <div class="text-6xl mb-4">🎫</div>
+                    <h3 class="font-mega text-xl mb-2">PASS VIP +</h3>
+                    <p class="text-sm font-bold text-gray-500 mb-4">Accès loges & meet & greet</p>
+                    <div class="font-mega text-2xl text-fp-red mb-4">199€</div>
+                    <button class="bg-fp-red text-white px-6 py-2 rounded-xl font-bold border-2 border-black hover:bg-black transition">Ajouter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cartApp() {
+            return {
+                cartItems: [],
+                promoCode: '',
+                promoApplied: false,
+                
+                init() {
+                    this.loadCart();
+                },
+                
+                loadCart() {
+                    this.cartItems = JSON.parse(localStorage.getItem('fanpass_cart') || '[]');
+                },
+                
+                removeItem(index) {
+                    if (confirm('Supprimer cet article du panier ?')) {
+                        this.cartItems.splice(index, 1);
+                        this.saveCart();
+                    }
+                },
+                
+                updateQuantity(index, change) {
+                    const newQty = this.cartItems[index].quantity + change;
+                    if (newQty > 0 && newQty <= 10) {
+                        this.cartItems[index].quantity = newQty;
+                        this.saveCart();
+                    }
+                },
+                
+                clearCart() {
+                    if (confirm('Vider tout le panier ?')) {
+                        this.cartItems = [];
+                        this.saveCart();
+                        this.promoApplied = false;
+                    }
+                },
+                
+                saveCart() {
+                    localStorage.setItem('fanpass_cart', JSON.stringify(this.cartItems));
+                },
+                
+                applyPromo() {
+                    if (this.promoCode.toUpperCase() === 'EARLY2030') {
+                        this.promoApplied = true;
+                    } else {
+                        alert('❌ Code promo invalide');
+                    }
+                },
+                
+                checkout() {
+                    alert(`🎉 Commande validée !\n\n💰 Total: ${this.total}€\n📦 Livraison gratuite\n🎁 Code promo: ${this.promoApplied ? 'EARLY2030 (-20%)' : 'Aucun'}\n\n➡️ Redirection vers le paiement...`);
+                    // Redirection vers page de paiement
+                    // window.location.href = 'paiement.html';
+                },
+                
+                get totalItems() {
+                    return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+                },
+                
+                get subtotal() {
+                    return this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                },
+                
+                get discount() {
+                    return this.promoApplied ? Math.round(this.subtotal * 0.20) : 0;
+                },
+                
+                get total() {
+                    return this.subtotal - this.discount;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
