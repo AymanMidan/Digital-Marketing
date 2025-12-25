@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement Sécurisé | FanPass 2030</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { 'mega': ['"Archivo Black"', 'sans-serif'], 'body': ['Inter', 'sans-serif'], 'mono': ['"Share Tech Mono"', 'monospace'], }, colors: { 'fp-red': '#FF0040', 'fp-green': '#00EB78', 'fp-yellow': '#FFD600', 'fp-blue': '#0055FF', 'fp-dark': '#121212', } } } }
+    </script>
+    <style>
+        body { background-color: #F4F4F4; }
+        .bg-noise { position: fixed; inset: 0; z-index: -1; opacity: 0.05; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E"); pointer-events: none; }
+        .card-shadow { box-shadow: 8px 8px 0px #000000; transition: all 0.2s; }
+        .card-gradient { background: linear-gradient(135deg, #111111 0%, #333333 100%); }
+        .chip { background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%); }
+        
+        /* Animation Loader */
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #000; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+
+<body class="font-body text-fp-dark antialiased" x-data="paymentApp()">
+    <div class="bg-noise"></div>
+
+    <header class="bg-white border-b-4 border-black py-4 sticky top-0 z-50">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-2xl font-mega italic tracking-tighter">
+                <i class="fas fa-lock text-fp-green"></i>
+                <span>SECURE<span class="text-fp-blue">PAY</span></span>
+            </div>
+            <a href="panier.html" class="font-bold text-gray-500 hover:text-black transition">
+                <i class="fas fa-arrow-left mr-2"></i>Retour Panier
+            </a>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-12 max-w-6xl">
+        <div class="grid lg:grid-cols-3 gap-12">
+            
+            <div class="lg:col-span-2">
+                <h1 class="text-4xl font-mega mb-8 uppercase">Méthode de Paiement</h1>
+                
+                <div class="flex gap-4 mb-8">
+                    <button @click="method = 'card'" 
+                            :class="method === 'card' ? 'bg-black text-white scale-105' : 'bg-white text-black'"
+                            class="flex-1 py-4 rounded-xl font-mega text-xl border-4 border-black card-shadow uppercase transition flex items-center justify-center gap-3">
+                        <i class="fas fa-credit-card"></i> Carte
+                    </button>
+                    <button @click="method = 'paypal'" 
+                            :class="method === 'paypal' ? 'bg-[#0070BA] text-white border-[#003087] scale-105' : 'bg-white text-black border-black'"
+                            class="flex-1 py-4 rounded-xl font-mega text-xl border-4 card-shadow uppercase transition flex items-center justify-center gap-3">
+                        <i class="fab fa-paypal"></i> PayPal
+                    </button>
+                </div>
+
+                <div x-show="method === 'card'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">
+                    
+                    <div class="mb-10 relative perspective-1000">
+                        <div class="w-full max-w-md mx-auto aspect-[1.586/1] card-gradient rounded-2xl p-6 shadow-2xl text-white relative overflow-hidden border-4 border-gray-800">
+                            <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                            
+                            <div class="flex justify-between items-start mb-8">
+                                <div class="w-12 h-9 chip rounded-md border border-yellow-600"></div>
+                                <div class="text-2xl font-bold italic opacity-80">VISA</div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <div class="text-xs opacity-70 uppercase mb-1">Numéro de Carte</div>
+                                <div class="font-mono text-2xl tracking-widest" x-text="cardNumber || '•••• •••• •••• ••••'"></div>
+                            </div>
+                            
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <div class="text-xs opacity-70 uppercase mb-1">Titulaire</div>
+                                    <div class="font-mono text-lg uppercase tracking-wide" x-text="cardName || 'NOM PRÉNOM'"></div>
+                                </div>
+                                <div>
+                                    <div class="text-xs opacity-70 uppercase mb-1">EXP</div>
+                                    <div class="font-mono text-lg" x-text="cardExp || 'MM/AA'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form @submit.prevent="processPayment" class="bg-white border-4 border-black p-8 rounded-[2rem] card-shadow space-y-6">
+                        <div>
+                            <label class="block font-mega uppercase text-sm mb-2">Numéro de carte</label>
+                            <div class="relative">
+                                <input type="text" x-model="cardNumber" maxlength="19" @input="formatCardNumber" placeholder="0000 0000 0000 0000" class="w-full bg-gray-50 border-4 border-black rounded-xl py-3 pl-12 pr-4 font-mono text-lg focus:outline-none focus:bg-yellow-50 transition" required>
+                                <i class="fas fa-credit-card absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-mega uppercase text-sm mb-2">Nom du titulaire</label>
+                            <div class="relative">
+                                <input type="text" x-model="cardName" placeholder="Comme sur la carte" class="w-full bg-gray-50 border-4 border-black rounded-xl py-3 pl-12 pr-4 font-bold text-lg focus:outline-none focus:bg-yellow-50 transition" required>
+                                <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block font-mega uppercase text-sm mb-2">Expiration</label>
+                                <input type="text" x-model="cardExp" maxlength="5" @input="formatExp" placeholder="MM/AA" class="w-full bg-gray-50 border-4 border-black rounded-xl py-3 px-4 font-mono text-lg focus:outline-none focus:bg-yellow-50 transition text-center" required>
+                            </div>
+                            <div>
+                                <label class="block font-mega uppercase text-sm mb-2">CVC</label>
+                                <div class="relative">
+                                    <input type="text" maxlength="3" placeholder="123" class="w-full bg-gray-50 border-4 border-black rounded-xl py-3 px-4 font-mono text-lg focus:outline-none focus:bg-yellow-50 transition text-center" required>
+                                    <i class="fas fa-question-circle absolute right-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" :disabled="loading" class="w-full bg-fp-green text-black py-5 rounded-xl font-mega text-2xl border-4 border-black hover:bg-black hover:text-white transition uppercase shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-y-1 flex justify-center items-center gap-3">
+                            <span x-show="!loading">Payer <span x-text="total + '€'"></span></span>
+                            <div x-show="loading" class="spinner"></div>
+                        </button>
+                    </form>
+                    
+                    <div class="flex justify-center gap-4 mt-6 text-2xl text-gray-400">
+                        <i class="fab fa-cc-visa hover:text-blue-600 transition"></i>
+                        <i class="fab fa-cc-mastercard hover:text-red-500 transition"></i>
+                        <i class="fab fa-cc-amex hover:text-blue-400 transition"></i>
+                        <i class="fas fa-lock text-green-500 text-sm flex items-center gap-1"> 128-bit SSL</i>
+                    </div>
+                </div>
+
+                <div x-show="method === 'paypal'" class="text-center py-10 bg-white border-4 border-black rounded-[2rem] card-shadow">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="w-48 mx-auto mb-8">
+                    <p class="text-xl font-bold text-gray-600 mb-8 max-w-md mx-auto">Vous allez être redirigé vers PayPal pour finaliser votre paiement de manière sécurisée.</p>
+                    <button @click="processPayment" class="bg-[#FFC439] text-[#003087] px-12 py-4 rounded-full font-black text-xl border-4 border-black hover:scale-105 transition shadow-[4px_4px_0px_#000]">
+                        Payer avec PayPal
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="bg-fp-yellow border-4 border-black p-8 rounded-[2rem] card-shadow sticky top-28">
+                    <h3 class="font-mega text-2xl uppercase mb-6 border-b-4 border-black pb-4">Ta Commande</h3>
+                    
+                    <div class="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2">
+                        <template x-for="item in cartItems">
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="font-bold">
+                                    <span x-text="item.quantity"></span>x <span x-text="item.name"></span>
+                                </div>
+                                <div class="font-mono" x-text="item.price * item.quantity + '€'"></div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="border-t-4 border-black pt-4 space-y-2">
+                        <div class="flex justify-between font-bold text-gray-700">
+                            <span>Sous-total</span>
+                            <span x-text="total + '€'"></span>
+                        </div>
+                        <div class="flex justify-between font-bold text-fp-blue">
+                            <span>Livraison</span>
+                            <span>OFFERTE</span>
+                        </div>
+                        <div class="flex justify-between items-center text-2xl pt-4 mt-2 border-t-2 border-black/20">
+                            <span class="font-mega">TOTAL</span>
+                            <span class="font-mega underline decoration-4 decoration-black" x-text="total + '€'"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-white border-4 border-black p-4 rounded-xl text-center">
+                    <p class="font-bold text-sm text-gray-500">Besoin d'aide ?</p>
+                    <p class="font-mega text-lg">+212 6 00 00 00 00</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div x-show="success" class="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center backdrop-blur-sm" style="display: none;">
+        <div class="bg-white border-4 border-black p-10 rounded-[3rem] max-w-md w-full text-center shadow-[20px_20px_0px_#FF0040] transform scale-100 transition-all">
+            <div class="w-24 h-24 bg-fp-green text-black rounded-full border-4 border-black flex items-center justify-center text-5xl mx-auto mb-6 animate-bounce">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="text-4xl font-mega uppercase mb-4">Paiement Validé !</h2>
+            <p class="text-xl font-bold text-gray-600 mb-8">Ton FanPass 2030 est en route. Prépare-toi à vivre l'histoire.</p>
+            
+            <div class="bg-gray-100 border-2 border-dashed border-gray-400 p-4 rounded-xl mb-8">
+                <p class="text-sm font-mono text-gray-500">ID Transaction</p>
+                <p class="font-mono font-bold text-lg">#FP-2030-X892</p>
+            </div>
+
+            <a href="index.html" @click="localStorage.removeItem('fanpass_cart')" class="inline-block w-full bg-black text-white py-4 rounded-xl font-mega text-xl uppercase hover:bg-fp-red transition">
+                Retour Accueil
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function paymentApp() {
+            return {
+                method: 'card',
+                cardNumber: '',
+                cardName: '',
+                cardExp: '',
+                loading: false,
+                success: false,
+                cartItems: [],
+                total: 0,
+
+                init() {
+                    const items = JSON.parse(localStorage.getItem('fanpass_cart') || '[]');
+                    this.cartItems = items;
+                    this.total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    
+                    // Si panier vide, rediriger
+                    if(this.total === 0) window.location.href = 'boutique.html';
+                },
+
+                formatCardNumber() {
+                    let val = this.cardNumber.replace(/\D/g, '');
+                    val = val.replace(/(\d{4})/g, '$1 ').trim();
+                    this.cardNumber = val;
+                },
+
+                formatExp() {
+                    let val = this.cardExp.replace(/\D/g, '');
+                    if (val.length >= 2) {
+                        val = val.substring(0, 2) + '/' + val.substring(2, 4);
+                    }
+                    this.cardExp = val;
+                },
+
+                processPayment() {
+                    this.loading = true;
+                    // Simulation délais réseau
+                    setTimeout(() => {
+                        this.loading = false;
+                        this.success = true;
+                        // Confetti ou autre effet ici
+                    }, 2500);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
