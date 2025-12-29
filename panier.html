@@ -320,7 +320,7 @@
                 },
                 
                 checkout() {
-                    alert(`🎉 Commande validée !\n\n💰 Total: ${this.total}€\n📦 Livraison gratuite\n🎁 Code promo: ${this.promoApplied ? 'EARLY2030 (-20%)' : 'Aucun'}\n\n➡️ Redirection vers le paiement...`);
+                    window.location.href = 'paiement.html';
                     // Redirection vers page de paiement
                     // window.location.href = 'paiement.html';
                 },
